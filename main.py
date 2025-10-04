@@ -32,7 +32,7 @@ def main():
 
     generate_response(client, message, verbose)
 
-def generate_response(client, message, verbose):
+def generate_response(client, message, verbose=False):
     # Tell the agent what local tools it has access to.
     available_functions = types.Tool(
         function_declarations=[
@@ -79,20 +79,78 @@ def generate_response(client, message, verbose):
         elif response.text:
             # If there were no function calls, simply print the text response.
             print(response.text)
+            return
 
-    # Step 3: If there were function calls, iterate over the list and split them out, then announce each call.
+    # Step 3: If there were function calls, prepare responses.
+    if function_calls:
+        tool_responses = []
+        # Now iterate over the list and execute the functions.
     for call in function_calls:
-        function_name = call.name
-        function_args = {k: v for k, v in call.args.items()}
-        print(f"Calling function: {function_name}({function_args})")
+        # Step 4: Second response that actually calls the function the agent identified.
+        tool_response = call_function(call, verbose)
+        tool_responses.append(tool_response)
 
-    # Step 4: Second response that actually calls the function the agent identified.
+    # Add the model's function call and the tool's output to conversation history.
+    message.append(candidate.content)
+    message.extend(tool_responses)
+
+    # Call API again to get the final answer
+    response = client.models.generate_content(
+        model='gemini-2.0-flash-001',
+        contents=message,
+        config=types.GenerateContentConfig(
+        tools=[available_functions],
+        system_instruction=system_prompt)
+    )
+
+    # Step 5: Print the final text response from the model.
+    print(response.text)
+    if verbose:
+        print(f"-> {tool_response.parts[0].function_response.response}") if verbose else None
+    if not response.text and verbose:
+        print("Model did not provide a final text response after tool execution.")
 
     # Append API usage data if verbose flag is toggled.
     if verbose:
-        print(f"User prompt: {message}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+
+def call_function(call, verbose=False):
+    function_name = call.name
+    function_args = call.args
+    if verbose:
+            print(f"Calling function: {function_name}({function_args})")
+    else:
+        print(f"Calling function: {function_name}")
+    function_dict = {
+        "get_files_info": get_files_info.get_files_info,
+        "get_file_content": get_file_content.get_file_content,
+        "run_python_file": run_python_file.run_python_file,
+        "write_file": write_file.write_file,
+    }
+    
+    if function_name not in function_dict:
+        return types.Content(
+            role="tool",
+            parts=[
+                types.Part.from_function_response(
+                    name=function_name,
+                    response={"error": f"Unknown function: {function_name}"},
+                )
+            ]
+        )
+    args = dict(call.args)
+    args["working_directory"] = config.WORKING_DIR
+    function_result = function_dict[function_name](**args)
+    return types.Content(
+        role="tool",
+        parts=[
+            types.Part.from_function_response(
+                name=function_name,
+                response={"result": function_result},
+            )
+        ]
+    )
 
 if __name__ == "__main__":
     main()
