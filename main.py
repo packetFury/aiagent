@@ -69,8 +69,6 @@ def generate_response(client, message, verbose):
         for part in candidate.content.parts:
             if part.function_call:
                 function_calls.append(part.function_call)
-            elif part.text:
-                print(part.text)
 
     # Step 2.5: If no function calls were found by iterating parts, check for API mismatch with old/alternate attributes
     if not function_calls:
@@ -92,7 +90,7 @@ def generate_response(client, message, verbose):
 
     # Append API usage data if verbose flag is toggled.
     if verbose:
-        print(f"User prompt: {args[0]}")
+        print(f"User prompt: {message}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 
