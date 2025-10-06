@@ -6,7 +6,7 @@ This is a toy. This is not a production-level LLM assistant. It was built by a n
 Do not trust it. This code is provided as a proof-of-concept ONLY, and is provided as-is without any warranty, promisse, or guarantee, express or implied. In fact, I am actively warning you that you should not use this project in its current form
 for any level of production. Caveat emptor.
 
--# Also, my legal representation advises me to state that no AIs were harmed in the making of this agent. Despite our best efforts.
+<sup>Also, my legal representation advises me to state that no AIs were harmed in the making of this agent. Despite our best efforts.</sup>
 
 ## Description
 Project Guidelines: https://www.boot.dev/courses/build-ai-agent-python
@@ -42,4 +42,5 @@ Sit back in amazement as I offload the LLM functions to Google, giving the false
 ## Future Project Plans
 - Continual improvement of guardrails until I am convinced that giving this... thing... the ability to read, write, and execute code wasn't a phenomenally bad idea.
 - Giving it a nice GUI so that you don't have to dirty your precious hands with CLI
+
 
