@@ -41,6 +41,9 @@ Sit back in amazement as I offload the LLM functions to Google, giving the false
 ## Future Project Plans
 - Continual improvement of guardrails until I am convinced that giving this... thing... the ability to read, write, and execute code wasn't a phenomenally bad idea.
 - Giving it a nice GUI so that you don't have to dirty your precious hands with CLI
+- Make a proper deployment package that prompts the user for their Google AI Studio API key and sets up the environment.
+- Ollama local LLM integration, option to use other LLM models.
+
 
 
 
