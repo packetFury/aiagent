@@ -32,7 +32,7 @@ This LLM agent currently leverages Google Gemini to parse text prompts, and has 
 3. In the project root folder, create a file named ".env", and paste the following:
 ```GEMINI_API_KEY="[YOUR API KEY GOES HERE]" ```
 4. Run command line:
-```python3 main.py "PROMPT GOES HERE" [--verbose]```
+```python3 main.py "PROMPT GOES HERE" [--verbose]``` (--verbose as an optional flag if you care about some of the underlying technical details like token usage)
 5. ~~Sob hysterically as it sudo rm -rf / --NO-PRESERVE-ROOTs your hard drive and deletes your entire hardfought collection of memes~~ 
 Sit back in amazement as I offload the LLM functions to Google, giving the false impression of unprecedented competence.
 6. ???
@@ -43,6 +43,7 @@ Sit back in amazement as I offload the LLM functions to Google, giving the false
 - Giving it a nice GUI so that you don't have to dirty your precious hands with CLI
 - Make a proper deployment package that prompts the user for their Google AI Studio API key and sets up the environment.
 - Ollama local LLM integration, option to use other LLM models.
+
 
 
 
