@@ -33,6 +33,9 @@ def main():
     generate_response(client, message, verbose)
 
 def generate_response(client, message, verbose=False):
+    # Set maximum iterations to prevent infinite loops
+    MAX_ITERATIONS = config.MAX_ITERS
+
     # Tell the agent what local tools it has access to.
     available_functions = types.Tool(
         function_declarations=[
@@ -46,74 +49,70 @@ def generate_response(client, message, verbose=False):
     # Obtain our system prompt from config.
     system_prompt = config.SYSTEM_PROMPT
 
-    response = client.models.generate_content(
-        model='gemini-2.0-flash-001', 
-        contents=message,
-        config=types.GenerateContentConfig(
-            tools=[available_functions],
-            system_instruction=system_prompt)
-    )
+    iters = 0
+    # Start the feedback loop
+    while iters < MAX_ITERATIONS:
+        iters =+ 1
 
-    function_calls = []
-    candidate = response.candidates[0]
-    # Check for whether the model called one of our functions, then get that metadata
-    # Step 1: Get the parts from the first candidate.
-    try:
-        candidate_parts = response.candidates[0].content.parts
-    except (IndexError, AttributeError):
-        print("Model response was empty or blocked")
-        return
+        response = client.models.generate_content(
+            model='gemini-2.0-flash-001', 
+            contents=message,
+            config=types.GenerateContentConfig(
+                tools=[available_functions],
+                system_instruction=system_prompt)
+        )
+    
 
-    # Step 2: Iterate content parts to find the function calls if they exist
-    if candidate.content and candidate.content.parts:
+        function_calls = []
+        candidate = None
+        final_text = ""
+        # Check for whether the model called one of our functions, then get that metadata
+        # Step 1: Get the parts from the first candidate.
+        try:
+            candidate = response.candidates[0]
+        except (IndexError, AttributeError):
+            print("Model response was empty or blocked")
+            return
+
+        # Step 2: Iterate content parts to find the function calls if they exist
         for part in candidate.content.parts:
             if part.function_call:
                 function_calls.append(part.function_call)
+            if part.text:
+                final_text += part.text
 
-    # Step 2.5: If no function calls were found by iterating parts, check for API mismatch with old/alternate attributes
-    if not function_calls:
-        if hasattr(candidate, 'function_calls') and candidate.function_calls:
-            function_calls = candidate.function_calls
-        elif hasattr(candidate, 'function_call') and candidate.function_call:
-            function_calls = [candidate.function_call] # Wrap in a list for consistency
-        elif response.text:
-            # If there were no function calls, simply print the text response.
-            print(response.text)
+        # Step 2.5: If no function calls were found by iterating parts, check for API mismatch with old/alternate attributes
+        if not function_calls:
+            if hasattr(candidate, 'function_calls') and candidate.function_calls:
+                function_calls = candidate.function_calls
+            elif hasattr(candidate, 'function_call') and candidate.function_call:
+                function_calls = [candidate.function_call] # Wrap in a list for consistency
+
+        # Step 3: Check for response.text to determine if this is the final output. If it is, return it.
+        if final_text and not function_calls:
+            print(final_text)
             return
 
-    # Step 3: If there were function calls, prepare responses.
-    if function_calls:
-        tool_responses = []
-        # Now iterate over the list and execute the functions.
-    for call in function_calls:
-        # Step 4: Second response that actually calls the function the agent identified.
-        tool_response = call_function(call, verbose)
-        tool_responses.append(tool_response)
+        # Step 4: If there were function calls, prepare responses.
+        if function_calls:
+            tool_responses = []
+            # Now iterate over the list and execute the functions.
+        for call in function_calls:
+            # Step 4: Second response that actually calls the function the agent identified.
+            tool_response = call_function(call, verbose)
+            tool_responses.append(tool_response)
 
-    # Add the model's function call and the tool's output to conversation history.
-    message.append(candidate.content)
-    message.extend(tool_responses)
+        # Add the model's function call and the tool's output to conversation history.
+        message.append(candidate.content)
+        message.extend(tool_responses)
 
-    # Call API again to get the final answer
-    response = client.models.generate_content(
-        model='gemini-2.0-flash-001',
-        contents=message,
-        config=types.GenerateContentConfig(
-        tools=[available_functions],
-        system_instruction=system_prompt)
-    )
+        # Call API again to get the final answer
+        continue
 
-    # Step 5: Print the final text response from the model.
-    print(response.text)
-    if verbose:
-        print(f"-> {tool_response.parts[0].function_response.response}") if verbose else None
-    if not response.text and verbose:
-        print("Model did not provide a final text response after tool execution.")
-
-    # Append API usage data if verbose flag is toggled.
-    if verbose:
-        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-        print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+        # Append API usage data if verbose flag is toggled.
+        if verbose:
+            print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+            print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 
 def call_function(call, verbose=False):
     function_name = call.name
