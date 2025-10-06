@@ -3,7 +3,7 @@
 
 ### IMPORTANT DISCLAIMER
 This is a toy. This is not a production-level LLM assistant. It was built by a novice. It does not have the robust guardrails you would find in a production LLM assistant. It also currently has the ability to ***run arbitrary code*** and ***write files to disk***. 
-Do not trust it. This code is provided as a proof-of-concept ONLY, and is provided as-is without any warranty, promisse, or guarantee, express or implied. In fact, I am actively warning you that you should not use this project in its current form
+Do not trust it. This code is provided as a proof-of-concept ONLY, and is provided as-is without any warranty, promise, or guarantee, express or implied. In fact, I am actively warning you that you should not use this project in its current form
 for any level of production. Caveat emptor.
 
 <sup>Also, my legal representation advises me to state that no AIs were harmed in the making of this agent. Despite our best efforts.</sup>
@@ -11,8 +11,7 @@ for any level of production. Caveat emptor.
 ## Description
 Project Guidelines: https://www.boot.dev/courses/build-ai-agent-python
 
-This is the product of a guided Boot.dev project that teaches learners how to put together an LLM agent that can act as a coding assistant. The project guidance did not simply instruct the learner to "copy this code and run it", but instead
-provided high-level instructions on the intended goals and referenced the relevant documentation that could help achieve them.
+This is the product of a guided Boot.dev project that teaches learners how to put together an LLM agent that can act as a coding assistant. The project guidance provided high-level instructions on the intended goals and referenced the relevant documentation that could help achieve them.
 
 ## Capabilities
 This LLM agent currently leverages Google Gemini to parse text prompts, and has a small suite of tools to assist with software development. It can:
@@ -42,5 +41,6 @@ Sit back in amazement as I offload the LLM functions to Google, giving the false
 ## Future Project Plans
 - Continual improvement of guardrails until I am convinced that giving this... thing... the ability to read, write, and execute code wasn't a phenomenally bad idea.
 - Giving it a nice GUI so that you don't have to dirty your precious hands with CLI
+
 
 
