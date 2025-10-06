@@ -2,7 +2,7 @@
 *(No time for pithy, pseudo-philosophical name branding)*
 
 ### IMPORTANT DISCLAIMER
-This is a toy. This is not a production-level LLM assistant. It was built by a novice. It does not have the robust guardrails you would find in a production. It also currently has the ability to ***run arbitrary code*** and ***write files to disk***. 
+This is a toy. This is not a production-level LLM assistant. It was built by a novice. It does not have the robust guardrails you would find in a production LLM assistant. It also currently has the ability to ***run arbitrary code*** and ***write files to disk***. 
 Do not trust it. This code is provided as a proof-of-concept ONLY, and is provided as-is without any warranty, promisse, or guarantee, express or implied. In fact, I am actively warning you that you should not use this project in its current form
 for any level of production. Caveat emptor.
 
@@ -42,3 +42,4 @@ Sit back in amazement as I offload the LLM functions to Google, giving the false
 ## Future Project Plans
 - Continual improvement of guardrails until I am convinced that giving this... thing... the ability to read, write, and execute code wasn't a phenomenally bad idea.
 - Giving it a nice GUI so that you don't have to dirty your precious hands with CLI
+
